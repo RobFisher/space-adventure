@@ -2,8 +2,10 @@
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 
+use super::commander::Commander;
 
-pub fn command_loop() {
+
+pub fn command_loop(commander: &mut Commander) {
     let mut rl = Editor::<()>::new();
     if rl.load_history("history.txt").is_err() {
         println!("No previous history.");
@@ -16,7 +18,8 @@ pub fn command_loop() {
                 if line == "quit" || line == "exit" {
                     break;
                 }
-                println!("{} failed.", line);
+                let output = process_command(line, commander);
+                println!("{}", output);
             }
             Err(ReadlineError::Interrupted) => {
                 break;
@@ -31,4 +34,13 @@ pub fn command_loop() {
         }
     }
     rl.save_history("history.txt").unwrap();
+}
+
+
+fn process_command(line: String, commander: &mut Commander) -> String {
+    match line.as_ref() {
+        "whoami" => commander.name.clone(),
+        "rating" => commander.get_rating(),
+        _ => "error".to_owned(),
+    }
 }

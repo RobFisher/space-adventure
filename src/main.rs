@@ -1,3 +1,4 @@
+mod commander;
 mod commands;
 
 fn get_credits() -> i32 {
@@ -45,9 +46,10 @@ fn test_parse_args() {
 fn main() {
     let args = std::env::args();
     let name = parse_args(args);
-    println!("Hello, Cmdr {}.", name);
+    let mut commander = commander::Commander::new(name);
+    println!("Hello, Cmdr {}.", commander.name);
     println!("Credits: {}", get_credits());
     buy_item(3, 84);
-    commands::command_loop();
-    println!("Goodbye, Cmdr {}.", name);
+    commands::command_loop(&mut commander);
+    println!("Goodbye, Cmdr {}.", commander.name);
 }
