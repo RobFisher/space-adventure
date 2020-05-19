@@ -41,6 +41,7 @@ fn process_command(line: String, commander: &mut Commander) -> String {
     match line.as_ref() {
         "whoami" => commander.name.clone(),
         "rating" => commander.get_rating(),
+        "shipname" => commander.ship.name.clone(),
         _ => "error".to_owned(),
     }
 }

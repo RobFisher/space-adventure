@@ -1,5 +1,6 @@
 mod commander;
 mod commands;
+mod ship;
 
 fn get_credits() -> i32 {
     42
@@ -27,7 +28,7 @@ fn parse_args (args: impl Iterator<Item = String>) -> String
 {
     let name = args.skip(1).next();
     match name {
-        None => "Jameson".to_string(),
+        None => "Jameson".to_owned(),
         Some(value) => value,
     }
 }

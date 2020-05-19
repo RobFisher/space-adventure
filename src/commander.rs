@@ -1,9 +1,12 @@
 // commander.rs
 
+use super::ship::Ship;
+
 pub struct Commander {
     pub name: String,
     pub credits: i32,
     rating: i8,
+    pub ship: Ship,
 }
 
 
@@ -13,6 +16,7 @@ impl Commander {
             name: name,
             credits: 0,
             rating: 0,
+            ship: Ship::new("My first ship".to_owned()),
         }
     }
 
