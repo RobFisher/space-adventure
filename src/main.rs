@@ -1,6 +1,7 @@
 mod commander;
 mod commands;
 mod ship;
+mod market;
 
 fn get_credits() -> i32 {
     42
@@ -48,9 +49,11 @@ fn main() {
     let args = std::env::args();
     let name = parse_args(args);
     let mut commander = commander::Commander::new(name);
+    let market = market::make_test_market();
+    let commodity_catalog = market::make_test_commodity_catalog();
     println!("Hello, Cmdr {}.", commander.name);
     println!("Credits: {}", get_credits());
     buy_item(3, 84);
-    commands::command_loop(&mut commander);
+    commands::command_loop(&mut commander, &market, &commodity_catalog);
     println!("Goodbye, Cmdr {}.", commander.name);
 }

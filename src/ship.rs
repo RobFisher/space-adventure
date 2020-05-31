@@ -1,6 +1,5 @@
 // ship.rs
 
-
 pub struct Ship {
     pub name: String,
     pub cargo_space: i32,
