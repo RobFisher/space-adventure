@@ -3,27 +3,6 @@ mod commands;
 mod ship;
 mod market;
 
-fn get_credits() -> i32 {
-    42
-}
-
-#[test]
-fn test_get_credits() {
-    assert_eq!(get_credits(), 42)
-}
-
-
-fn buy_item(quantity: i8, price: i32) -> i32 {
-    let cost = price * quantity as i32;
-    println!("You bought {} for {}.", quantity, cost);
-    cost
-}
-
-#[test]
-fn test_buy_item() {
-    assert_eq!(buy_item(3, 12), 36)
-}
-
 
 fn parse_args (args: impl Iterator<Item = String>) -> String
 {
@@ -33,6 +12,7 @@ fn parse_args (args: impl Iterator<Item = String>) -> String
         Some(value) => value,
     }
 }
+
 
 #[test]
 fn test_parse_args() {
@@ -52,8 +32,7 @@ fn main() {
     let market = market::make_test_market();
     let commodity_catalog = market::make_test_commodity_catalog();
     println!("Hello, Cmdr {}.", commander.name);
-    println!("Credits: {}", get_credits());
-    buy_item(3, 84);
+    println!("You have {} credits.", commander.credits);
     commands::command_loop(&mut commander, &market, &commodity_catalog);
     println!("Goodbye, Cmdr {}.", commander.name);
 }

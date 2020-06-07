@@ -1,6 +1,10 @@
 // commander.rs
 
 use super::ship::Ship;
+use super::market::Market;
+use super::market::MarketAction;
+use super::market::Commodity;
+
 
 pub struct Commander {
     pub name: String,
@@ -14,7 +18,7 @@ impl Commander {
     pub fn new(name: String) -> Commander {
         Commander {
             name: name,
-            credits: 0,
+            credits: 1000,
             rating: 0,
             ship: Ship::new("My first ship".to_owned()),
         }
@@ -26,5 +30,15 @@ impl Commander {
             1 => "novice".to_owned(),
             _ => "*classified*".to_owned(),
         }
+    }
+
+    pub fn buy(&mut self, market: &Market, commodity: &Commodity, qty: u32) -> Option<i32> {
+        let price = market.get_price(commodity, MarketAction::Buy) * qty as i32;
+        let mut spent: Option<i32> = None;
+        if price <= self.credits {
+            self.credits -= price;
+            spent = Some(price);
+        }
+        spent
     }
 }

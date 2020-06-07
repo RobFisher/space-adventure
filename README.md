@@ -22,5 +22,6 @@ cd target/release
 - rating: display commander rating
 - shipname: display ship name
 - whoami: display commander name
+- buy quanity commodity-name: buy a commodity from the market
 
 Exit with either quit or exit.

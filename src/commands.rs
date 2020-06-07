@@ -1,9 +1,11 @@
 // commands.rs
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
+use std::str::FromStr;
 
 use super::commander::Commander;
 use super::market::Market;
+use super::market::MarketAction;
 use super::market::Commodity;
 
 
@@ -40,11 +42,50 @@ pub fn command_loop(commander: &mut Commander, market: &Market, commodity_catalo
 
 
 fn process_command(line: String, commander: &mut Commander, market: &Market, commodity_catalog: &Vec<Commodity>) -> String {
-    match line.as_ref() {
+    let mut words = line.split_whitespace();
+    let first_word = words
+        .next()
+        .unwrap_or("");
+
+    match first_word {
         "whoami" => commander.name.clone(),
         "rating" => commander.get_rating(),
         "shipname" => commander.ship.name.clone(),
         "market" => market.get_price_list(commodity_catalog),
+        "buy" => process_buy_command(words.collect(), commander, market, commodity_catalog),
         _ => "error".to_owned(),
+    }
+}
+
+
+fn process_buy_command(words: Vec<&str>, commander: &mut Commander, market: &Market, commodity_catalog: &Vec<Commodity>) -> String {
+    let error = "To buy, type: buy <quanity> <commodity name>.".to_owned();
+    if words.len() == 2 {
+        if let Ok(quanity) = FromStr::from_str(words[0]) {
+            if let Some(commodity) = commodity_catalog.iter().find(|&x| x.name == words[1]) {
+                if let Some(cost) = commander.buy(market, commodity, quanity) {
+                    format!("Bought {} {} for {}. You have {} credits remaining.",
+                        quanity,
+                        commodity.name,
+                        cost,
+                        commander.credits,
+                    )
+                }
+                else {
+                    format!("Unable to buy {} {} as price is {} per item and you have {} credits.",
+                        quanity,
+                        commodity.name,
+                        market.get_price(commodity, MarketAction::Buy),
+                        commander.credits,
+                    )
+                }
+            } else {
+                format!("Commodity {} not found in the market.", words[1])
+            }
+        } else {
+            error
+        }
+    } else {
+        error
     }
 }
