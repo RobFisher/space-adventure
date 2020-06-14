@@ -23,5 +23,6 @@ cd target/release
 - shipname: display ship name
 - whoami: display commander name
 - buy quanity commodity-name: buy a commodity from the market
+- cargo: list the contents of the ship's cargo hold
 
 Exit with either quit or exit.

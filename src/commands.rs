@@ -53,6 +53,7 @@ fn process_command(line: String, commander: &mut Commander, market: &Market, com
         "shipname" => commander.ship.name.clone(),
         "market" => market.get_price_list(commodity_catalog),
         "buy" => process_buy_command(words.collect(), commander, market, commodity_catalog),
+        "cargo" => commander.ship.get_cargo(),
         _ => "error".to_owned(),
     }
 }
@@ -64,6 +65,7 @@ fn process_buy_command(words: Vec<&str>, commander: &mut Commander, market: &Mar
         if let Ok(quanity) = FromStr::from_str(words[0]) {
             if let Some(commodity) = commodity_catalog.iter().find(|&x| x.name == words[1]) {
                 if let Some(cost) = commander.buy(market, commodity, quanity) {
+                    commander.ship.load_cargo(commodity.name.clone(), quanity);
                     format!("Bought {} {} for {}. You have {} credits remaining.",
                         quanity,
                         commodity.name,
