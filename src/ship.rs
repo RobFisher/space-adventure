@@ -26,6 +26,21 @@ impl Ship {
         *existing_quantity += quantity;
     }
 
+    pub fn unload_cargo(&mut self, name: &String, quantity: u32) {
+        let cargo_entry = self.cargo.get_mut(name);
+        match cargo_entry {
+            Some(c) => {
+                if *c >= quantity {
+                    *c -= quantity;
+                }
+                if *c == 0 {
+                    self.cargo.remove(name);
+                }
+            }
+            None => {}
+        }
+    }
+
     pub fn get_cargo(&self) -> String {
         if self.cargo.len() == 0 {
             "Cargo hold is empty.".to_owned()

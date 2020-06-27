@@ -41,4 +41,10 @@ impl Commander {
         }
         spent
     }
+
+    pub fn sell(&mut self, market: &Market, commodity: &Commodity, qty: u32) -> i32 {
+        let price = market.get_price(commodity, MarketAction::Sell) * qty as i32;
+        self.credits += price;
+        price
+    }
 }
