@@ -55,6 +55,7 @@ fn process_command(line: String, commander: &mut Commander, market: &Market, com
         "buy" => process_buy_command(words.collect(), commander, market, commodity_catalog),
         "sell" => process_sell_command(words.collect(), commander, market, commodity_catalog),
         "cargo" => commander.ship.get_cargo(),
+        "credits" => format!("You have {} credits.", commander.credits),
         _ => "error".to_owned(),
     }
 }

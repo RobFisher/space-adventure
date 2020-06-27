@@ -19,10 +19,12 @@ cd target/release
 
 ## Commands
 - market: display market price list
+- credits: display credits balance
 - rating: display commander rating
 - shipname: display ship name
 - whoami: display commander name
 - buy quanity commodity-name: buy a commodity from the market
+- sell quantity commodity-name: sell a commodity to the market
 - cargo: list the contents of the ship's cargo hold
 
 Exit with either quit or exit.
