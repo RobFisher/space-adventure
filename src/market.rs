@@ -32,9 +32,13 @@ pub struct Commodity {
 }
 
 
-pub struct Market {
+type CommodityCatalog = Vec<Commodity>;
+
+
+pub struct Market<'a> {
     pub supply: HashMap<EconomyType, f32>,
     pub demand: HashMap<EconomyType, f32>,
+    catalog: &'a CommodityCatalog,
 }
 
 
@@ -44,8 +48,12 @@ pub enum MarketAction {
 }
 
 
-impl Market {
-    pub fn get_price(&self, commodity: &Commodity, action: MarketAction) -> i32 {
+impl Market<'_> {
+    pub fn get_commodity(&self, name: &String) -> Option<&Commodity> {
+        self.catalog.iter().find(|&x| x.name == *name)
+    }
+
+    fn calculate_price(&self, commodity: &Commodity, action: MarketAction) -> i32 {
         let price_multiplier_by_economy_type = match action {
             MarketAction::Buy => &self.supply,
             MarketAction::Sell => &self.demand,
@@ -67,15 +75,23 @@ impl Market {
         result.unwrap_or(1.0) as i32 // TODO: figure out why result is an Option
     }
 
+    pub fn get_price(&self, commodity_name: &String, action: MarketAction) -> Option<i32> {
+        if let Some(commodity) = self.get_commodity(commodity_name) {
+            Some(self.calculate_price(commodity, action))
+        }
+        else {
+            None
+        }
+    }
 
-    pub fn get_price_list(&self, commodities: &Vec<Commodity>) -> String {
-        commodities
+    pub fn get_price_list(&self) -> String {
+        self.catalog
             .iter()
             .map(
                 |s| format!("{}: Buy Price: {} Sell Price: {}",
                 s.name,
-                self.get_price(s, MarketAction::Buy),
-                self.get_price(s, MarketAction::Sell),
+                self.calculate_price(s, MarketAction::Buy),
+                self.calculate_price(s, MarketAction::Sell),
             ))
             .collect::<Vec<String>>()
             .join("\n")
@@ -83,7 +99,7 @@ impl Market {
 }
 
 
-pub fn make_test_commodity_catalog() -> Vec<Commodity> {
+pub fn make_test_commodity_catalog() -> CommodityCatalog {
     // make some test commodities.
     // TODO: make these from a configuration file
     let food = Commodity {
@@ -114,7 +130,7 @@ pub fn make_test_commodity_catalog() -> Vec<Commodity> {
 }
 
 
-pub fn make_test_market() -> Market {
+pub fn make_test_market(catalog: &CommodityCatalog) -> Market {
     // make a test market.
     // TODO: make a function that generate this procedurally
     // based on parameters about the economy in a location.
@@ -127,5 +143,6 @@ pub fn make_test_market() -> Market {
     Market {
         supply: supply_map,
         demand: demand_map,
+        catalog: catalog,
     }
 }

@@ -29,10 +29,10 @@ fn main() {
     let args = std::env::args();
     let name = parse_args(args);
     let mut commander = commander::Commander::new(name);
-    let market = market::make_test_market();
     let commodity_catalog = market::make_test_commodity_catalog();
+    let market = market::make_test_market(&commodity_catalog);
     println!("Hello, Cmdr {}.", commander.name);
     println!("You have {} credits.", commander.credits);
-    commands::command_loop(&mut commander, &market, &commodity_catalog);
+    commands::command_loop(&mut commander, &market);
     println!("Goodbye, Cmdr {}.", commander.name);
 }

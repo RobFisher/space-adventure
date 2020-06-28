@@ -21,8 +21,8 @@ impl Ship {
         }
     }
 
-    pub fn load_cargo(&mut self, name: String, quantity: u32) {
-        let existing_quantity = self.cargo.entry(name).or_insert(0);
+    pub fn load_cargo(&mut self, name: &String, quantity: u32) {
+        let existing_quantity = self.cargo.entry(name.clone()).or_insert(0);
         *existing_quantity += quantity;
     }
 

@@ -1,9 +1,6 @@
 // commander.rs
 
 use super::ship::Ship;
-use super::market::Market;
-use super::market::MarketAction;
-use super::market::Commodity;
 
 
 pub struct Commander {
@@ -32,19 +29,18 @@ impl Commander {
         }
     }
 
-    pub fn buy(&mut self, market: &Market, commodity: &Commodity, qty: u32) -> Option<i32> {
-        let price = market.get_price(commodity, MarketAction::Buy) * qty as i32;
-        let mut spent: Option<i32> = None;
-        if price <= self.credits {
-            self.credits -= price;
-            spent = Some(price);
+    pub fn spend(&mut self, amount: i32) -> Option<i32> {
+        // TODO: decide what to do if passed a negative number
+        if amount <= self.credits {
+            self.credits -= amount;
+            Some(amount)
+        } else {
+            None
         }
-        spent
     }
 
-    pub fn sell(&mut self, market: &Market, commodity: &Commodity, qty: u32) -> i32 {
-        let price = market.get_price(commodity, MarketAction::Sell) * qty as i32;
-        self.credits += price;
-        price
+    pub fn earn(&mut self, amount: i32) {
+        // TODO: think about overflow handling (only real reason for this method)
+        self.credits += amount;
     }
 }
