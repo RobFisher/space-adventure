@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 rustyline = "6.1.2"
+unicase = "2.6.0"

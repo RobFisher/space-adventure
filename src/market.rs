@@ -12,6 +12,7 @@
 // calculated lazily.
 
 use std::collections::HashMap;
+use unicase::eq;
 
 
 #[derive(PartialEq, Eq, Hash)]
@@ -50,7 +51,7 @@ pub enum MarketAction {
 
 impl Market<'_> {
     pub fn get_commodity(&self, name: &String) -> Option<&Commodity> {
-        self.catalog.iter().find(|&x| x.name == *name)
+        self.catalog.iter().find(|&x| eq(&x.name, &name))
     }
 
     fn calculate_price(&self, commodity: &Commodity, action: MarketAction) -> i32 {
