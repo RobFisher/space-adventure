@@ -2,6 +2,7 @@ mod commander;
 mod commands;
 mod ship;
 mod market;
+mod simulation;
 
 
 fn parse_args (args: impl Iterator<Item = String>) -> String
@@ -33,6 +34,7 @@ fn main() {
     let market = market::make_test_market(&commodity_catalog);
     println!("Hello, Cmdr {}.", commander.name);
     println!("You have {} credits.", commander.credits);
-    commands::command_loop(&mut commander, &market);
+    let tx = simulation::start_simulation();
+    commands::command_loop(&mut commander, &market, tx);
     println!("Goodbye, Cmdr {}.", commander.name);
 }

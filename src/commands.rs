@@ -2,13 +2,15 @@
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 use std::str::FromStr;
+use std::sync::mpsc;
 
 use super::commander::Commander;
 use super::market::Market;
 use super::market::MarketAction;
+use super::simulation::Message;
 
 
-pub fn command_loop(commander: &mut Commander, market: &Market) {
+pub fn command_loop(commander: &mut Commander, market: &Market, tx: mpsc::Sender<Message>) {
     let mut rl = Editor::<()>::new();
     if rl.load_history("history.txt").is_err() {
         println!("No previous history.");
@@ -21,7 +23,7 @@ pub fn command_loop(commander: &mut Commander, market: &Market) {
                 if line == "quit" || line == "exit" {
                     break;
                 }
-                let output = process_command(line, commander, market);
+                let output = process_command(line, commander, market, &tx);
                 println!("{}", output);
             }
             Err(ReadlineError::Interrupted) => {
@@ -40,7 +42,7 @@ pub fn command_loop(commander: &mut Commander, market: &Market) {
 }
 
 
-fn process_command(line: String, commander: &mut Commander, market: &Market) -> String {
+fn process_command(line: String, commander: &mut Commander, market: &Market, tx: &mpsc::Sender<Message>) -> String {
     let mut words = line.split_whitespace();
     let first_word = words
         .next()
@@ -55,6 +57,14 @@ fn process_command(line: String, commander: &mut Commander, market: &Market) -> 
         "sell" => process_sell_command(words.collect(), commander, market),
         "cargo" => commander.ship.get_cargo(),
         "credits" => format!("You have {} credits.", commander.credits),
+        "dock" => {
+            tx.send(Message::Dock).unwrap();
+            "Docking requested.".to_owned()
+        },
+        "undock" => {
+            tx.send(Message::Undock).unwrap();
+            "Undocking requested.".to_owned()
+        },
         _ => "error".to_owned(),
     }
 }

@@ -26,5 +26,7 @@ cd target/release
 - buy quanity commodity-name: buy a commodity from the market
 - sell quantity commodity-name: sell a commodity to the market
 - cargo: list the contents of the ship's cargo hold
+- undock: if docked, start undocking procedure
+- dock: if undocked, start docking procedure
 
 Exit with either quit or exit.
