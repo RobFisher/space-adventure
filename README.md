@@ -28,5 +28,6 @@ cd target/release
 - cargo: list the contents of the ship's cargo hold
 - undock: if docked, start undocking procedure
 - dock: if undocked, start docking procedure
+- status: display ship status
 
 Exit with either quit or exit.

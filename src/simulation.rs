@@ -23,6 +23,15 @@ pub struct SimulationState {
 
 
 impl SimulationState {
+    pub fn get_status(&mut self) -> String {
+        match self.docked_state.docking_status {
+            DockingStatus::Docked => "Docked.".to_owned(),
+            DockingStatus::Undocking => format!("Undocking. {}s to go.", self.docked_state.time_to_go),
+            DockingStatus::Docking => format!("Docking. {}s to go.", self.docked_state.time_to_go),
+            DockingStatus::Undocked => "Undocked.".to_owned(),
+        }
+    }
+
     pub fn dock(&mut self) -> String {
         match self.docked_state.docking_status {
             DockingStatus::Undocked => {

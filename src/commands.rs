@@ -57,12 +57,9 @@ fn process_command(line: String, commander: &mut Commander, market: &Market, mut
         "sell" => process_sell_command(words.collect(), commander, market),
         "cargo" => commander.ship.get_cargo(),
         "credits" => format!("You have {} credits.", commander.credits),
-        "dock" => {
-            simulation_state.dock()
-        },
-        "undock" => {
-            simulation_state.undock()
-        },
+        "dock" => simulation_state.dock(),
+        "undock" => simulation_state.undock(),
+        "status" => simulation_state.get_status(),
         _ => "error".to_owned(),
     }
 }
