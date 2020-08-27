@@ -34,7 +34,6 @@ fn main() {
     let market = market::make_test_market(&commodity_catalog);
     println!("Hello, Cmdr {}.", commander.name);
     println!("You have {} credits.", commander.credits);
-    let tx = simulation::start_simulation();
-    commands::command_loop(&mut commander, &market, tx);
-    println!("Goodbye, Cmdr {}.", commander.name);
+    let simulation_mutex = simulation::start_simulation();
+    commands::command_loop(&mut commander, &market, simulation_mutex);
 }

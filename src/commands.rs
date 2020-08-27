@@ -2,15 +2,15 @@
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 use std::str::FromStr;
-use std::sync::mpsc;
+use std::sync::{Arc, Mutex, MutexGuard};
 
 use super::commander::Commander;
 use super::market::Market;
 use super::market::MarketAction;
-use super::simulation::Message;
+use super::simulation::SimulationState;
 
 
-pub fn command_loop(commander: &mut Commander, market: &Market, tx: mpsc::Sender<Message>) {
+pub fn command_loop(commander: &mut Commander, market: &Market, simulation_mutex: Arc<Mutex<SimulationState>>) {
     let mut rl = Editor::<()>::new();
     if rl.load_history("history.txt").is_err() {
         println!("No previous history.");
@@ -23,7 +23,7 @@ pub fn command_loop(commander: &mut Commander, market: &Market, tx: mpsc::Sender
                 if line == "quit" || line == "exit" {
                     break;
                 }
-                let output = process_command(line, commander, market, &tx);
+                let output = process_command(line, commander, market, simulation_mutex.lock().unwrap());
                 println!("{}", output);
             }
             Err(ReadlineError::Interrupted) => {
@@ -42,7 +42,7 @@ pub fn command_loop(commander: &mut Commander, market: &Market, tx: mpsc::Sender
 }
 
 
-fn process_command(line: String, commander: &mut Commander, market: &Market, tx: &mpsc::Sender<Message>) -> String {
+fn process_command(line: String, commander: &mut Commander, market: &Market, mut simulation_state: MutexGuard<SimulationState>) -> String {
     let mut words = line.split_whitespace();
     let first_word = words
         .next()
@@ -58,12 +58,10 @@ fn process_command(line: String, commander: &mut Commander, market: &Market, tx:
         "cargo" => commander.ship.get_cargo(),
         "credits" => format!("You have {} credits.", commander.credits),
         "dock" => {
-            tx.send(Message::Dock).unwrap();
-            "Docking requested.".to_owned()
+            simulation_state.dock()
         },
         "undock" => {
-            tx.send(Message::Undock).unwrap();
-            "Undocking requested.".to_owned()
+            simulation_state.undock()
         },
         _ => "error".to_owned(),
     }

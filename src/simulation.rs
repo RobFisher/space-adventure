@@ -1,12 +1,6 @@
-use std::sync::mpsc;
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time;
-
-
-pub enum Message {
-    Dock,
-    Undock,
-}
 
 
 // TODO: this should be part of the Ship struct
@@ -28,6 +22,35 @@ pub struct SimulationState {
 }
 
 
+impl SimulationState {
+    pub fn dock(&mut self) -> String {
+        match self.docked_state.docking_status {
+            DockingStatus::Undocked => {
+                self.docked_state.time_to_go = 10;
+                self.docked_state.docking_status = DockingStatus::Docking;
+                "Docking.".to_owned()
+            },
+            DockingStatus::Docked => "Already docked.".to_owned(),
+            DockingStatus::Docking => "Already docking.".to_owned(),
+            DockingStatus::Undocking => "Unable to dock while undocking.".to_owned(),
+        }
+    }
+
+    pub fn undock(&mut self) -> String {
+        match self.docked_state.docking_status {
+            DockingStatus::Docked => {
+                self.docked_state.time_to_go = 7;
+                self.docked_state.docking_status = DockingStatus::Undocking;
+                "Undocking.".to_owned()
+            },
+            DockingStatus::Undocked => "Already undocked.".to_owned(),
+            DockingStatus::Undocking => "Already undocking.".to_owned(),
+            DockingStatus::Docking => "Unable to undock while docking.".to_owned(),
+        }
+    }
+}
+
+
 fn initialise_simulation_state() -> SimulationState {
     SimulationState {
         docked_state: DockedState {
@@ -38,56 +61,22 @@ fn initialise_simulation_state() -> SimulationState {
 }
 
 
-pub fn start_simulation() -> mpsc::Sender<Message> {
-    let (tx, rx) = mpsc::channel();
+pub fn start_simulation() -> Arc<Mutex<SimulationState>> {
+    let simulation_state = initialise_simulation_state();
+    let simulation_mutex_reference = Arc::new(Mutex::new(simulation_state));
+    let thread_simulation_mutex_reference = Arc::clone(&simulation_mutex_reference);
     thread::spawn(move || {
-        simulation_thread(rx);
+        simulation_thread(thread_simulation_mutex_reference);
     });
-    tx
+    Arc::clone(&simulation_mutex_reference)
 }
 
 
-fn simulation_thread(rx: mpsc::Receiver<Message>) {
-    let mut simulation_state = initialise_simulation_state();
+fn simulation_thread(simulation_mutex: Arc<Mutex<SimulationState>>) {
     loop {
         thread::sleep(time::Duration::from_millis(1000));
-        loop {
-            match rx.try_recv() {
-                Err(_) => break,
-                Ok(message) => handle_message(message, &mut simulation_state),
-            }
-        }
-        update_state(&mut simulation_state);
-    }
-}
-
-
-fn handle_dock(simulation_state: &mut SimulationState) {
-    match simulation_state.docked_state.docking_status {
-        DockingStatus::Undocked => {
-            simulation_state.docked_state.time_to_go = 10;
-            simulation_state.docked_state.docking_status = DockingStatus::Docking;
-        },
-        _ => (),
-    }
-}
-
-
-fn handle_undock(simulation_state: &mut SimulationState) {
-    match simulation_state.docked_state.docking_status {
-        DockingStatus::Docked => {
-            simulation_state.docked_state.time_to_go = 7;
-            simulation_state.docked_state.docking_status = DockingStatus::Undocking;
-        },
-        _ => (),
-    }
-}
-
-
-fn handle_message(message: Message, simulation_state: &mut SimulationState) {
-    match message {
-        Message::Dock => handle_dock(simulation_state),
-        Message::Undock => handle_undock(simulation_state),
+        let mut simulation_state = simulation_mutex.lock().unwrap();
+        update_state(&mut *simulation_state);
     }
 }
 
